@@ -18,11 +18,12 @@ function calculateWinner(squares) {
   function isWinner(i, j, shift) {
     let step = 1;
     const [x, y] = shift;
-    if(0 <= i + x*(WIN_LEN-1) < BOARD_H && 0 <= j + y*(WIN_LEN-1) < BOARD_W) {
-      for(step; step < WIN_LEN; step++) {
-        if(squares[i + x*step][j + y*step] != squares[i][j]) {
-          break;
-        }
+    const boundary_i = i + x*(WIN_LEN-1), boundary_j = j + y*(WIN_LEN-1);
+    if(boundary_i < 0 || boundary_i >= BOARD_H || boundary_j < 0 || boundary_j >= BOARD_W)
+      return false; 
+    for(step; step < WIN_LEN; step++) {
+      if(squares[i + x*step][j + y*step] != squares[i][j]) {
+        break;
       }
     }
     return step === WIN_LEN;
