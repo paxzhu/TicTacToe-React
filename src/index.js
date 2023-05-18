@@ -16,27 +16,25 @@ function Square(props) {
 
 function calculateWinner(squares) {
   function isWinner(i, j, shift) {
-    let length = 1;
+    let step = 1;
     const [x, y] = shift;
-    for(let step = 1; step < WIN_LEN; step++) {
-      if(squares[i + x*step][j + y*step] != squares[i][j] || length === WIN_LEN) {
-        break;
+    if(0 <= i + x*(WIN_LEN-1) < BOARD_H && 0 <= j + y*(WIN_LEN-1) < BOARD_W) {
+      for(step; step < WIN_LEN; step++) {
+        if(squares[i + x*step][j + y*step] != squares[i][j]) {
+          break;
+        }
       }
-      length += 1;
     }
-    return length === WIN_LEN;
+    return step === WIN_LEN;
   }
 
   for(let i = 0; i < squares.length; i++) {
     for(let j = 0; j < squares[0].length; j++) {
       if(squares[i][j]) {
-        if(j + 4 < squares[0].length && isWinner(i, j, [0, 1]))
-          return squares[i][j];
-        if(i + 4 < squares.length && isWinner(i, j, [1, 0]))
-          return squares[i][j];
-        if(j + 4 < squares[0].length && i + 4 < squares.length && isWinner(i, j, [1, 1]))
-          return squares[i][j];
-        if(j - 4 >= 0 && i + 4 < squares.length && isWinner(i, j, [1, -1])) 
+        if(isWinner(i, j, [0, 1]) || 
+            isWinner(i, j, [1, 0]) || 
+            isWinner(i, j, [1, 1]) || 
+            isWinner(i, j, [1, -1]))
           return squares[i][j];
       }
     }
