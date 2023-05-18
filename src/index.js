@@ -11,24 +11,59 @@ function Square(props) {
 }
 
 function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2, 3, 4],
-    [5, 6, 7, 8, 9],
-    [10, 11, 12, 13, 14],
-    [15, 16, 17, 18, 19],
-    [20, 21, 22, 23, 24],
-    [0, 5, 10, 15, 20],
-    [1, 6, 11, 16, 21],
-    [2, 7, 12, 17, 22],
-    [3, 8, 13, 18, 23],
-    [4, 9, 14, 19, 24],
-    [0, 6, 12, 18, 24],
-    [4, 8, 12, 16, 20],
-  ];
-  for(let i = 0; i < lines.length; i++) {
-    const [a, b, c, d, e] = lines[i];
-    if(squares[a] && squares[a] == squares[b] && squares[a] == squares[c] && squares[a] == squares[d] && squares[a] == squares[e]) {
-      return squares[a];
+  function rightWin(i, j) {
+    let length = 1;
+    if(j + 4 >= squares[0].length)
+      return false 
+    for(let step = 1; step < 5; step++) {
+      if(squares[i][j+step] != squares[i][j] || length === 5){
+        break;
+      }
+      length += 1;
+    }
+    return length === 5
+  }
+  function downWin(i, j) {
+    let length = 1;
+    if(i + 4 >= squares.length)
+      return false 
+    for(let step = 1; step < 5; step++) {
+      if(squares[i+step][j] != squares[i][j] || length === 5){
+        break;
+      }
+      length += 1;
+    }
+    return length === 5
+  }
+  function slashWin1(i, j) {
+    let length = 1;
+    if(j + 4 >= squares[0].length || i + 4 >= squares.length)
+      return false 
+    for(let step = 1; step < 5; step++) {
+      if(squares[i+step][j+step] != squares[i][j] || length === 5){
+        break;
+      }
+      length += 1;
+    }
+    return length === 5
+  }
+  function slashWin2(i, j) {
+    let length = 1;
+    if(j - 4 < 0 || i + 4 >= squares.length)
+      return false 
+    for(let step = 1; step < 5; step++) {
+      if(squares[i+step][j-step] != squares[i][j] || length === 5){
+        break;
+      }
+      length += 1;
+    }
+    return length === 5
+  }
+  for(let i = 0; i < squares.length; i++) {
+    for(let j = 0; j < squares[0].length; j++) {
+      if(squares[i][j] && (rightWin(i, j) || downWin(i, j) || slashWin1(i, j) || slashWin2(i, j))) {
+        return squares[i][j];
+      }
     }
   }
   return null;
@@ -38,17 +73,17 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(25).fill(null),
+      squares: Array.from({length:7}, () => Array(7).fill(null)),
       xIsNext: true,
     };
   }
 
-  handleClick(i) {
-    if(!calculateWinner(this.state.squares) && !this.state.squares[i]) {
+  handleClick(i, j) {
+    if(!calculateWinner(this.state.squares) && !this.state.squares[i][j]) {
       const squares = this.state.squares.slice();
-      squares[i] = 'X';
+      squares[i][j] = 'X';
       if(!this.state.xIsNext) {
-        squares[i] = 'O';
+        squares[i][j] = 'O';
       }
       this.setState({
         squares: squares, 
@@ -57,8 +92,8 @@ class Board extends React.Component {
     }
   }
 
-  renderSquare(i) {
-    return <Square value={this.state.squares[i]} onClick={() => this.handleClick(i) } />;
+  renderSquare(i, j) {
+    return <Square value={this.state.squares[i][j]} onClick={() => this.handleClick(i, j) } />;
   }
 
   render() {
@@ -71,9 +106,9 @@ class Board extends React.Component {
     return (
       <div>
         <div className="status">{status}</div>
-        {Array(5).fill(null).map((_, row) => (
+        {Array(7).fill(null).map((_, row) => (
           <div key={row} className="board-row">
-            {Array(5).fill(null).map((_, col) => this.renderSquare(row*5 + col))}
+            {Array(7).fill(null).map((_, col) => this.renderSquare(row, col))}
           </div>
         ))}
       </div>
